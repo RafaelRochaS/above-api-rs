@@ -4,7 +4,8 @@ use std::{
 };
 
 use above_api_rs::create_app;
-use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt};
+use tracing::Level;
+use tracing_subscriber::FmtSubscriber;
 
 struct ServerConfig {
     host: IpAddr,
@@ -15,9 +16,12 @@ mod consts;
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::registry()
-        .with(tracing_subscriber::fmt::layer())
-        .init();
+    let subscriber = FmtSubscriber::builder()
+        .pretty()
+        .with_max_level(Level::DEBUG)
+        .finish();
+
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 
     let server_config = load_configs();
 
